@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>今天又有什么想法？ · 基础牌阵</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0e0b16 0%, #1f1a2b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px 12px;
+        }
+
+        .tarot-container {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(26, 21, 38, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 40px 40px 36px 36px;
+            padding: 20px 14px 24px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(200, 160, 255, 0.1);
+            border: 1px solid rgba(180, 140, 230, 0.12);
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .title-section h1 {
+            font-size: 1.9rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #efe6ff;
+            text-shadow: 0 0 20px #8f70c0aa, 0 4px 16px rgba(0,0,0,0.7);
+            line-height: 1.3;
+        }
+        .title-section .subhead {
+            color: #b8a3d9;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            margin-top: 2px;
+            opacity: 0.7;
+            font-weight: 300;
+            border-top: 1px solid #3d3250;
+            display: inline-block;
+            padding-top: 6px;
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .spread-selector {
+            margin: 8px 0 10px;
+        }
+        .spread-selector .label {
+            color: #b8a3d9;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+            text-align: center;
+        }
+        .spread-scroll {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            max-height: 80px;
+            overflow-y: auto;
+            padding: 4px 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #5b4a74 #1f1a2b;
+        }
+        .spread-scroll::-webkit-scrollbar { width: 3px; }
+        .spread-scroll::-webkit-scrollbar-track { background: #1f1a2b; border-radius: 12px; }
+        .spread-scroll::-webkit-scrollbar-thumb { background: #5b4a74; border-radius: 12px; }
+
+        .spread-btn {
+            background: #1e1830;
+            border: 1px solid #4a3b64;
+            color: #cbbce6;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .spread-btn:hover { background: #3f305a; border-color: #9a7fc9; }
+        .spread-btn.active { background: #6a4f94; border-color: #b898f0; color: #fff; box-shadow: 0 0 16px #6a4f9466; }
+
+        .question-area {
+            margin: 8px 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .question-area .label {
+            color: #b8a3d9;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            text-align: center;
+        }
+        .question-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .question-row input {
+            flex: 1;
+            min-width: 120px;
+            background: #1a1525;
+            border: 1px solid #4a3b64;
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #ede4ff;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .question-row input::placeholder { color: #6b5a83; font-weight: 300; }
+        .question-row input:focus { border-color: #9a7fc9; }
+        .question-row .btn-sm {
+            background: #2a223b;
+            border: 1px solid #6d5791;
+            color: #ede4ff;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .question-row .btn-sm:hover { background: #3f305a; border-color: #9a7fc9; }
+        .recommend-tag {
+            text-align: center;
+            color: #b898f0;
+            font-size: 0.7rem;
+            min-height: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .spread-desc {
+            background: #161121;
+            border-radius: 16px;
+            padding: 8px 14px;
+            margin: 4px 0 10px;
+            border: 1px solid #342b4a;
+            text-align: center;
+        }
+        .spread-desc .name {
+            color: #ede4ff;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+        .spread-desc .desc {
+            color: #b09acf;
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        .spread-desc .positions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3px 10px;
+            margin-top: 3px;
+        }
+        .spread-desc .positions span {
+            color: #cbbce6;
+            font-size: 0.6rem;
+            background: #1e1830;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #3f305a;
+        }
+
+        .card-display {
+            background: #1d1829;
+            border-radius: 30px;
+            padding: 14px 10px 16px;
+            box-shadow: inset 0 8px 18px rgba(0,0,0,0.7), 0 10px 24px rgba(0,0,0,0.6);
+            margin-bottom: 12px;
+            border: 1px solid #3f3354;
+            min-height: 140px;
+        }
+
+        .card-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px 14px;
+        }
+
+        .card-slot-result {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1 0 60px;
+            max-width: 90px;
+        }
+        .card-slot-result .pos-label {
+            color: #b09acf;
+            font-size: 0.5rem;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+            opacity: 0.7;
+            text-align: center;
+            min-height: 1rem;
+        }
+        .card-slot-result .mini-card {
+            width: 56px;
+            height: 80px;
+            background: radial-gradient(circle at 20% 30%, #362b4a, #181222);
+            border-radius: 12px 4px 12px 4px;
+            box-shadow: 0 8px 16px -4px #000000cc, 0 0 0 1.5px #5b4a74, 0 0 0 4px #2e233f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            font-size: 1.8rem;
+        }
+        .card-slot-result .mini-card.reversed { transform: rotate(180deg); }
+        .card-slot-result .mini-card .emoji { transform: rotate(0deg); }
+        .card-slot-result .mini-card.reversed .emoji { transform: rotate(180deg); }
+        .card-slot-result .mini-card .back { font-size: 1.2rem; opacity: 0.3; letter-spacing: 4px; color: #b197d9; }
+        .card-slot-result .mini-name {
+            color: #cbbce6;
+            font-size: 0.45rem;
+            margin-top: 2px;
+            text-align: center;
+            opacity: 0.8;
+            max-width: 65px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .card-slot-result .mini-orient { color: #8a7aa0; font-size: 0.4rem; opacity: 0.6; }
+
+        .deck-selector {
+            background: #161121;
+            border-radius: 34px;
+            padding: 12px 8px 10px;
+            margin: 8px 0 6px;
+            border: 1px solid #3f3254;
+            box-shadow: inset 0 4px 10px #00000055;
+        }
+        .deck-label {
+            color: #b09acf;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 6px;
+            opacity: 0.7;
+        }
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 6px 5px;
+            justify-items: center;
+            align-items: center;
+            max-height: 160px;
+            overflow-y: auto;
+            padding: 4px 2px 6px;
+            scrollbar-width: thin;
+            scrollbar-color: #5b4a74 #1f1a2b;
+        }
+        .deck-grid::-webkit-scrollbar { width: 3px; }
+        .deck-grid::-webkit-scrollbar-track { background: #1f1a2b; border-radius: 12px; }
+        .deck-grid::-webkit-scrollbar-thumb { background: #5b4a74; border-radius: 12px; }
+
+        .card-slot {
+            background: #29213b;
+            border: 1px solid #4d3d64;
+            border-radius: 26px;
+            width: 100%;
+            aspect-ratio: 1/1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.0rem;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            box-shadow: 0 3px 0 #0e0b16;
+            color: #d4c2f0;
+            padding: 2px 0;
+            line-height: 1.2;
+            min-width: 30px;
+            user-select: none;
+            position: relative;
+        }
+        .card-slot .slot-back { font-size: 1.2rem; letter-spacing: 3px; color: #b197d9; opacity: 0.4; }
+        .card-slot .slot-label { font-size: 0.35rem; letter-spacing: 0.3px; opacity: 0.5; color: #b8a3d9; margin-top: 1px; white-space: nowrap; }
+        .card-slot:hover { background: #3f305a; border-color: #9a7fc9; transform: scale(1.02); }
+        .card-slot:active { transform: translateY(2px); box-shadow: 0 1px 0 #0e0b16; }
+        .card-slot.revealed {
+            background: #6a4f94;
+            border-color: #b898f0;
+            box-shadow: 0 3px 0 #3e2c5a, 0 0 16px #8f6fc0aa;
+            cursor: default;
+            opacity: 0.9;
+        }
+        .card-slot.revealed .slot-back { display: none; }
+        .card-slot.revealed .slot-emoji { display: block; font-size: 1.2rem; }
+        .card-slot.revealed .slot-label { opacity: 0.9; color: #f0e5ff; }
+        .card-slot .slot-emoji { display: none; }
+        .card-slot.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0e0b16;
+        }
+
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 12px;
+            margin-top: 12px;
+        }
+        .btn {
+            background: #2a223b;
+            border: 1px solid #6d5791;
+            color: #ede4ff;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #0e0b16, 0 10px 20px -8px #000000bb;
+            backdrop-filter: blur(4px);
+            background: rgba(40, 32, 60, 0.8);
+            flex: 1 0 auto;
+            min-width: 90px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .btn-primary {
+            background: #6a4f94;
+            border-color: #b898f0;
+            color: #fcf7ff;
+            box-shadow: 0 4px 0 #3e2c5a, 0 10px 24px -6px #573f7c;
+            font-weight: 500;
+        }
+        .btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 #3e2c5a; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0e0b16; }
+        .btn:disabled {
+            opacity: 0.4;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0e0b16;
+            pointer-events: none;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #6b5a83;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-top: 14px;
+            opacity: 0.7;
+            border-top: 1px solid #2f263f;
+            padding-top: 12px;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            .tarot-container { padding: 14px 8px 18px; border-radius: 32px; }
+            .title-section h1 { font-size: 1.5rem; letter-spacing: 3px; }
+            .card-slot-result .mini-card { width: 48px; height: 68px; font-size: 1.4rem; }
+            .spread-btn { font-size: 0.55rem; padding: 3px 10px; }
+            .question-row input { font-size: 0.75rem; padding: 6px 12px; }
+            .btn { padding: 8px 14px; font-size: 0.8rem; min-width: 80px; }
+            .deck-grid { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); max-height: 130px; gap: 5px 4px; }
+            .card-slot { font-size: 0.85rem; min-width: 26px; border-radius: 20px; }
+            .card-slot .slot-back { font-size: 1.0rem; }
+            .card-slot.revealed .slot-emoji { font-size: 1.0rem; }
+            .spread-scroll { max-height: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="tarot-container" id="app">
+        <div class="title-section">
+            <h1>今天又有什么想法？</h1>
+            <div class="subhead">✦ 基础牌阵 · 盲抽选位 ✦</div>
+        </div>
+
+        <div class="spread-selector">
+            <div class="label">✦ 选择牌阵 ✦</div>
+            <div class="spread-scroll">
+                <button v-for="sp in spreads" :key="sp.id" 
+                        class="spread-btn" :class="{ active: currentSpreadId === sp.id }"
+                        @click="selectSpread(sp.id)">
+                    {{ sp.name }}
+                </button>
+            </div>
+        </div>
+
+        <div class="question-area">
+            <div class="label">✧ 输入你的问题（可选）✧</div>
+            <div class="question-row">
+                <input type="text" v-model="userQuestion" placeholder="例如：我和TA的感情发展如何？" @keyup.enter="recommendSpread">
+                <button class="btn-sm" @click="recommendSpread"> 推荐</button>
+            </div>
+            <div class="recommend-tag" v-if="recommendResult">{{ recommendResult }}</div>
+        </div>
+
+        <div class="spread-desc" v-if="currentSpread">
+            <div class="name">{{ currentSpread.name }}</div>
+            <div class="desc">{{ currentSpread.desc }}</div>
+            <div class="positions">
+                <span v-for="p in currentSpread.positions" :key="p">{{ p }}</span>
+            </div>
+        </div>
+
+        <div class="card-display">
+            <div class="card-row">
+                <div v-for="(result, idx) in results" :key="idx" class="card-slot-result">
+                    <div class="pos-label">{{ currentSpread ? currentSpread.positions[idx] || '位置' + (idx+1) : '位置' + (idx+1) }}</div>
+                    <div class="mini-card" :class="{ reversed: result.reversed }">
+                        <span class="emoji" v-if="result.revealed">{{ result.card.emoji }}</span>
+                        <span class="back" v-else>✦</span>
+                    </div>
+                    <div class="mini-name" v-if="result.revealed">{{ result.card.name }}</div>
+                    <div class="mini-orient" v-if="result.revealed">{{ result.reversed ? '逆位' : '正位' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="deck-selector">
+            <div class="deck-label">✦ 点击牌位翻牌 · 依次揭示 ✦</div>
+            <div class="deck-grid">
+                <div v-for="(slot, index) in slots" :key="index" 
+                     class="card-slot" 
+                     :class="{ revealed: slot.revealed, disabled: slot.revealed || isRoundFinished }"
+                     @click="revealSlot(index)">
+                    <span class="slot-back" v-if="!slot.revealed">✦</span>
+                    <span class="slot-emoji" v-if="slot.revealed">{{ slot.card.emoji }}</span>
+                    <span class="slot-label">{{ slot.revealed ? slot.card.name.slice(0, 2) : '??' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-group">
+            <button class="btn btn-primary" @click="newRound" :disabled="isResetting">
+                <span v-if="!isResetting"> 新一轮</span>
+                <span v-else>✨ 洗牌中</span>
+            </button>
+            <button class="btn btn-secondary" @click="resetAll" :disabled="!isRoundFinished || isResetting">
+                🧹 重置
+            </button>
+        </div>
+        <div class="footer-note">@Sleepingworm · 基础牌阵系列</div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        (function() {
+            // ===== 78张塔罗牌 =====
+            const MAJOR_ARCANA = [
+                { id: 0, name: '愚者', emoji: '🤹', suit: '大阿尔卡纳',
+                  upright: '新的开始 · 纯真 · 冒险。放下顾虑，信任生命之流。',
+                  reversed: '鲁莽 · 轻率 · 逃避。需要停下来审视，不要盲目冲动。' },
+                { id: 1, name: '魔术师', emoji: '🪄', suit: '大阿尔卡纳',
+                  upright: '创造力 · 显化 · 掌握。你已拥有所需的一切资源。',
+                  reversed: '操纵 · 欺骗 · 能力被误用。诚实地审视自己的意图。' },
+                { id: 2, name: '女祭司', emoji: '', suit: '大阿尔卡纳',
+                  upright: '直觉 · 潜意识 · 内在智慧。静默中藏着答案。',
+                  reversed: '压抑直觉 · 忽视内在声音。重新连接你的第六感。' },
+                { id: 3, name: '女皇', emoji: '', suit: '大阿尔卡纳',
+                  upright: '丰盛 · 滋养 · 自然。拥抱感官，孕育生命能量。',
+                  reversed: '过度依赖 · 创造力受阻。需要重新找到内在的平衡。' },
+                { id: 4, name: '皇帝', emoji: '️', suit: '大阿尔卡纳',
+                  upright: '秩序 · 权威 · 结构。建立稳固的根基与规则。',
+                  reversed: '僵化 · 独裁 · 过度控制。学会适时放手。' },
+                { id: 5, name: '教皇', emoji: '⛪', suit: '大阿尔卡纳',
+                  upright: '传统 · 信仰 · 导师。寻求精神指引与智慧传承。',
+                  reversed: '教条 · 盲目追随 · 精神压抑。找到自己的真理。' },
+                { id: 6, name: '恋人', emoji: '', suit: '大阿尔卡纳',
+                  upright: '爱情 · 和谐 · 选择。跟随内心，在关系中看见自己。',
+                  reversed: '失衡 · 冲突 · 逃避责任。需要诚实的沟通。' },
+                { id: 7, name: '战车', emoji: '⚔️', suit: '大阿尔卡纳',
+                  upright: '意志 · 胜利 · 决心。驾驭冲突，勇往直前。',
+                  reversed: '失控 · 冲动 · 方向迷失。停下来重新校准目标。' },
+                { id: 8, name: '力量', emoji: '🦁', suit: '大阿尔卡纳',
+                  upright: '勇气 · 耐心 · 掌控。温柔与坚韧才是真正的力量。',
+                  reversed: '软弱 · 恐惧 · 自我怀疑。相信你内在的力量。' },
+                { id: 9, name: '隐士', emoji: '️', suit: '大阿尔卡纳',
+                  upright: '内省 · 独处 · 引导。在静默中寻找内在的光。',
+                  reversed: '孤立 · 逃避 · 过度退缩。适时与他人建立联系。' },
+                { id: 10, name: '命运之轮', emoji: '', suit: '大阿尔卡纳',
+                  upright: '周期 · 转折 · 命运。接纳变化，顺应生命之轮。',
+                  reversed: '抗拒 · 坏运气 · 卡住。放下执念，让变化自然发生。' },
+                { id: 11, name: '正义', emoji: '⚖️', suit: '大阿尔卡纳',
+                  upright: '公平 · 因果 · 真理。平衡选择，带来清晰。',
+                  reversed: '不公 · 责任逃避 · 自欺。为自己的选择负责。' },
+                { id: 12, name: '倒吊人', emoji: '', suit: '大阿尔卡纳',
+                  upright: '牺牲 · 视角 · 放手。换个角度，臣服带来洞见。',
+                  reversed: '拒绝放手 · 僵持 · 无谓牺牲。重新评估你的坚持。' },
+                { id: 13, name: '死神', emoji: '', suit: '大阿尔卡纳',
+                  upright: '结束 · 转变 · 重生。旧事已去，为新篇章腾出空间。',
+                  reversed: '抗拒改变 · 停滞 · 固守过往。拥抱必要的结束。' },
+                { id: 14, name: '节制', emoji: '⚗️', suit: '大阿尔卡纳',
+                  upright: '平衡 · 调和 · 耐心。融合对立，找到内在黄金比例。',
+                  reversed: '失衡 · 急躁 · 过度。找回内在的和谐与节奏。' },
+                { id: 15, name: '恶魔', emoji: '', suit: '大阿尔卡纳',
+                  upright: '束缚 · 物质 · 执念。检视恐惧，挣脱自我设限。',
+                  reversed: '觉醒 · 解放 · 放下执念。你比想象中更自由。' },
+                { id: 16, name: '高塔', emoji: '', suit: '大阿尔卡纳',
+                  upright: '突变 · 觉醒 · 崩塌。旧结构瓦解，迎接真实。',
+                  reversed: '勉强维持 · 抗拒崩溃。有时候瓦解本身就是重建。' },
+                { id: 17, name: '星星', emoji: '⭐', suit: '大阿尔卡纳',
+                  upright: '希望 · 灵感 · 宁静。宇宙与你同在，保持信念。',
+                  reversed: '绝望 · 失去方向 · 信心中断。重新寻找内心的光。' },
+                { id: 18, name: '月亮', emoji: '', suit: '大阿尔卡纳',
+                  upright: '直觉 · 幻想 · 未知。探索潜意识，信任内在感知。',
+                  reversed: '困惑 · 欺骗 · 恐惧。正视你的不安与情绪。' },
+                { id: 19, name: '太阳', emoji: '☀️', suit: '大阿尔卡纳',
+                  upright: '喜悦 · 活力 · 成功。光芒照耀，生命充满能量。',
+                  reversed: '骄傲 · 过度乐观 · 光芒过盛。保持谦逊与平衡。' },
+                { id: 20, name: '审判', emoji: '', suit: '大阿尔卡纳',
+                  upright: '觉醒 · 重生 · 宽恕。听见召唤，获得最终释然。',
+                  reversed: '抗拒 · 自我怀疑 · 逃避召唤。接纳真实的自己。' },
+                { id: 21, name: '世界', emoji: '', suit: '大阿尔卡纳',
+                  upright: '完成 · 整合 · 成就。周期圆满，新旅程即将开始。',
+                  reversed: '未完成 · 延迟 · 缺少闭环。检查需要收尾的事情。' }
+            ];
+            const WANDS = [
+                { id: 100, name: '权杖王牌', emoji: '', suit: '权杖',
+                  upright: '行动 · 开始 · 热情。新计划即将启动。',
+                  reversed: '延迟 · 缺乏动力 · 热情消退。重新点燃内在火焰。' },
+                { id: 101, name: '权杖二', emoji: '🪵', suit: '权杖',
+                  upright: '计划 · 决定 · 探索。站在十字路口，做出选择。',
+                  reversed: '犹豫 · 恐惧 · 错失机会。勇敢迈出第一步。' },
+                { id: 102, name: '权杖三', emoji: '', suit: '权杖',
+                  upright: '进展 · 远见 · 领导。事情正在向前推进。',
+                  reversed: '阻碍 · 延误 · 视野狭窄。重新审视全局。' },
+                { id: 103, name: '权杖四', emoji: '', suit: '权杖',
+                  upright: '稳定 · 庆祝 · 归属。家庭与事业的平衡。',
+                  reversed: '不和谐 · 变动 · 根基动摇。寻找内在的安定。' },
+                { id: 104, name: '权杖五', emoji: '⚔️', suit: '权杖',
+                  upright: '竞争 · 冲突 · 挑战。分歧中寻找成长。',
+                  reversed: '内耗 · 冲突升级 · 僵局。寻求和解与妥协。' },
+                { id: 105, name: '权杖六', emoji: '', suit: '权杖',
+                  upright: '胜利 · 认可 · 荣耀。努力得到回报。',
+                  reversed: '失败 · 傲慢 · 失去支持。保持谦逊与感恩。' },
+                { id: 106, name: '权杖七', emoji: '🛡️', suit: '权杖',
+                  upright: '坚持 · 勇气 · 防御。面对挑战不退缩。',
+                  reversed: '放弃 · 压力过大 · 失去信心。重新评估策略。' },
+                { id: 107, name: '权杖八', emoji: '✈️', suit: '权杖',
+                  upright: '快速 · 行动 · 自由。事情飞速发展。',
+                  reversed: '延迟 · 混乱 · 方向迷失。减速并重新校准。' },
+                { id: 108, name: '权杖九', emoji: '🛡️', suit: '权杖',
+                  upright: '坚韧 · 警惕 · 守住阵地。最后的坚持。',
+                  reversed: '倦怠 · 防备过度 · 孤立。放下重负，寻求支持。' },
+                { id: 109, name: '权杖十', emoji: '', suit: '权杖',
+                  upright: '负担 · 责任 · 压力。背负太多，需要分担。',
+                  reversed: '崩溃 · 过度承担 · 释放。学会放手与求助。' },
+                { id: 110, name: '权杖侍从', emoji: '🧑‍', suit: '权杖',
+                  upright: '好奇 · 新消息 · 探索。新的机会即将到来。',
+                  reversed: '分心 · 不成熟 · 消息延误。集中注意力。' },
+                { id: 111, name: '权杖骑士', emoji: '', suit: '权杖',
+                  upright: '冲动 · 冒险 · 行动力。大胆前行。',
+                  reversed: '鲁莽 · 急躁 · 无法完成。三思而后行。' },
+                { id: 112, name: '权杖王后', emoji: '', suit: '权杖',
+                  upright: '热情 · 独立 · 吸引力。自信地展现自己。',
+                  reversed: '嫉妒 · 控制 · 情绪化。回归内在平衡。' },
+                { id: 113, name: '权杖国王', emoji: '🤴', suit: '权杖',
+                  upright: '领导 · 远见 · 权威。成熟地引领方向。',
+                  reversed: '独裁 · 固执 · 滥用权力。学会倾听他人。' }
+            ];
+            const CUPS = [
+                { id: 200, name: '圣杯王牌', emoji: '', suit: '圣杯',
+                  upright: '爱 · 新情感 · 直觉。心灵的大门打开。',
+                  reversed: '情感阻塞 · 压抑 · 失去灵感。释放你的感受。' },
+                { id: 201, name: '圣杯二', emoji: '🤝', suit: '圣杯',
+                  upright: '连接 · 合作 · 吸引力。建立新的关系。',
+                  reversed: '失衡 · 误解 · 关系破裂。沟通与调和。' },
+                { id: 202, name: '圣杯三', emoji: '🥳', suit: '圣杯',
+                  upright: '庆祝 · 友谊 · 欢乐。与朋友共享喜悦。',
+                  reversed: '过度放纵 · 三角关系 · 八卦。保持真诚与节制。' },
+                { id: 203, name: '圣杯四', emoji: '', suit: '圣杯',
+                  upright: '内省 · 冷漠 · 错过机会。重新审视周遭。',
+                  reversed: '觉醒 · 接受 · 新可能性。睁开眼看向新机会。' },
+                { id: 204, name: '圣杯五', emoji: '', suit: '圣杯',
+                  upright: '失望 · 失落 · 遗憾。关注失去，但也看见留下的。',
+                  reversed: '接受 · 希望 · 向前看。从悲伤中走出来。' },
+                { id: 205, name: '圣杯六', emoji: '', suit: '圣杯',
+                  upright: '回忆 · 纯真 · 给予。与过去和解。',
+                  reversed: '执着过去 · 逃避现实 · 停滞。放下旧事，活在当下。' },
+                { id: 206, name: '圣杯七', emoji: '', suit: '圣杯',
+                  upright: '选择 · 幻想 · 愿景。许多可能性摆在面前。',
+                  reversed: '困惑 · 逃避现实 · 不切实际。聚焦现实的选择。' },
+                { id: 207, name: '圣杯八', emoji: '', suit: '圣杯',
+                  upright: '放下 · 告别 · 追寻。离开旧有舒适区。',
+                  reversed: '停滞 · 逃避 · 恐惧改变。勇敢面对转变。' },
+                { id: 208, name: '圣杯九', emoji: '', suit: '圣杯',
+                  upright: '满足 · 成就感 · 愉悦。愿望即将达成。',
+                  reversed: '贪婪 · 自满 · 过度追求。珍惜已拥有的。' },
+                { id: 209, name: '圣杯十', emoji: '‍‍‍', suit: '圣杯',
+                  upright: '家庭 · 和谐 · 幸福。情感上的圆满。',
+                  reversed: '家庭冲突 · 不和谐 · 情感疏离。修复关系。' },
+                { id: 210, name: '圣杯侍从', emoji: '🧑‍', suit: '圣杯',
+                  upright: '敏感 · 梦想 · 创意。新的灵感受启发。',
+                  reversed: '情绪化 · 逃避 · 不切实际。平衡情感与理智。' },
+                { id: 211, name: '圣杯骑士', emoji: '🦄', suit: '圣杯',
+                  upright: '浪漫 · 理想 · 追求。为爱勇敢前行。',
+                  reversed: '失望 · 逃避 · 不切实际的期待。脚踏实地。' },
+                { id: 212, name: '圣杯王后', emoji: '', suit: '圣杯',
+                  upright: '温柔 · 直觉 · 支持。用爱与关怀滋养他人。',
+                  reversed: '过度敏感 · 情绪泛滥 · 依赖。建立情感边界。' },
+                { id: 213, name: '圣杯国王', emoji: '🤴', suit: '圣杯',
+                  upright: '成熟 · 冷静 · 情感智慧。从容应对情感。',
+                  reversed: '情感压抑 · 冷漠 · 操控。敞开心扉。' }
+            ];
+            const SWORDS = [
+                { id: 300, name: '宝剑王牌', emoji: '️', suit: '宝剑',
+                  upright: '突破 · 真相 · 决断。清晰思维带来力量。',
+                  reversed: '困惑 · 谎言 · 冲突。以诚实面对挑战。' },
+                { id: 301, name: '宝剑二', emoji: '⚖️', suit: '宝剑',
+                  upright: '抉择 · 僵局 · 回避。需要做出决定。',
+                  reversed: '犹豫 · 矛盾 · 真相浮现。面对真实。' },
+                { id: 302, name: '宝剑三', emoji: '', suit: '宝剑',
+                  upright: '心碎 · 伤痛 · 分离。面对痛苦的真相。',
+                  reversed: '愈合 · 宽恕 · 放下过去。伤口正在愈合。' },
+                { id: 303, name: '宝剑四', emoji: '', suit: '宝剑',
+                  upright: '休息 · 恢复 · 静思。给自己休息的空间。',
+                  reversed: '过劳 · 焦虑 · 逃避。需要主动恢复。' },
+                { id: 304, name: '宝剑五', emoji: '⚔️', suit: '宝剑',
+                  upright: '冲突 · 争执 · 竞争。胜利背后有代价。',
+                  reversed: '和解 · 反思 · 放下争斗。寻求和平。' },
+                { id: 305, name: '宝剑六', emoji: '⛵', suit: '宝剑',
+                  upright: '过渡 · 疗愈 · 前行。离开困境，走向平静。',
+                  reversed: '滞留 · 无法前进 · 抗拒改变。释放过去。' },
+                { id: 306, name: '宝剑七', emoji: '️', suit: '宝剑',
+                  upright: '策略 · 隐瞒 · 孤独。用智慧突破困境。',
+                  reversed: '暴露 · 自欺 · 失败策略。诚实地面对。' },
+                { id: 307, name: '宝剑八', emoji: '', suit: '宝剑',
+                  upright: '限制 · 束缚 · 无力感。你以为被禁锢，其实可以挣脱。',
+                  reversed: '解放 · 觉醒 · 找到出路。打破自我限制。' },
+                { id: 308, name: '宝剑九', emoji: '', suit: '宝剑',
+                  upright: '焦虑 · 恐惧 · 噩梦。过度担忧创造痛苦。',
+                  reversed: '希望 · 寻求帮助 · 走出黑暗。光明在即。' },
+                { id: 309, name: '宝剑十', emoji: '⚰️', suit: '宝剑',
+                  upright: '结束 · 失败 · 被背叛。最糟糕的阶段已过。',
+                  reversed: '重生 · 恢复 · 新的开始。从灰烬中站起。' },
+                { id: 310, name: '宝剑侍从', emoji: '🧑‍', suit: '宝剑',
+                  upright: '好奇心 · 警觉 · 新想法。保持头脑开放。',
+                  reversed: '散漫 · 谣言 · 过度分析。聚焦重点。' },
+                { id: 311, name: '宝剑骑士', emoji: '', suit: '宝剑',
+                  upright: '果断 · 直接 · 挑战。以力量面对阻力。',
+                  reversed: '鲁莽 · 冲突 · 言语伤人。谨慎表达。' },
+                { id: 312, name: '宝剑王后', emoji: '', suit: '宝剑',
+                  upright: '智慧 · 独立 · 理性。客观地看待事物。',
+                  reversed: '冷漠 · 狡猾 · 过度评判。培养同理心。' },
+                { id: 313, name: '宝剑国王', emoji: '🤴', suit: '宝剑',
+                  upright: '权威 · 清晰 · 逻辑。用智慧领导。',
+                  reversed: '专制 · 刻薄 · 滥用智力。倾听内心。' }
+            ];
+            const PENTACLES = [
+                { id: 400, name: '星币王牌', emoji: '🪙', suit: '星币',
+                  upright: '机遇 · 丰盛 · 实用。物质上的新开始。',
+                  reversed: '错失机会 · 财务波动 · 缺乏规划。重新审视。' },
+                { id: 401, name: '星币二', emoji: '', suit: '星币',
+                  upright: '平衡 · 适应 · 多重任务。灵活应对。',
+                  reversed: '压力 · 失衡 · 财务紧张。调整节奏。' },
+                { id: 402, name: '星币三', emoji: '', suit: '星币',
+                  upright: '合作 · 技能 · 建设。团队协作创造价值。',
+                  reversed: '缺乏合作 · 技能不足 · 冲突。重新分工。' },
+                { id: 403, name: '星币四', emoji: '🛡️', suit: '星币',
+                  upright: '稳定 · 控制 · 保守。守住你的财富与能量。',
+                  reversed: '贪婪 · 僵化 · 不愿放手。学会投资与分享。' },
+                { id: 404, name: '星币五', emoji: '️', suit: '星币',
+                  upright: '困境 · 孤立 · 艰难。逆境中寻找希望。',
+                  reversed: '转变 · 恢复 · 互助。困境即将过去。' },
+                { id: 405, name: '星币六', emoji: '🤲', suit: '星币',
+                  upright: '慷慨 · 给予 · 接受。施与受的平衡。',
+                  reversed: '不平等 · 依赖 · 利用。重新审视关系。' },
+                { id: 406, name: '星币七', emoji: '', suit: '星币',
+                  upright: '耐心 · 等待 · 收获。努力正在结果。',
+                  reversed: '急躁 · 期望过高 · 无果。调整期待。' },
+                { id: 407, name: '星币八', emoji: '⚒️', suit: '星币',
+                  upright: '专注 · 技能 · 精进。持续努力终有回报。',
+                  reversed: '枯燥 · 缺乏进步 · 分心。找到工作的意义。' },
+                { id: 408, name: '星币九', emoji: '', suit: '星币',
+                  upright: '自足 · 享受 · 成功。收获丰盛果实。',
+                  reversed: '过度依赖 · 失去独立 · 虚假安全感。重拾自我。' },
+                { id: 409, name: '星币十', emoji: '', suit: '星币',
+                  upright: '传承 · 家族 · 稳定。构建持久价值。',
+                  reversed: '家庭冲突 · 财务问题 · 破碎。重建根基。' },
+                { id: 410, name: '星币侍从', emoji: '🧑‍', suit: '星币',
+                  upright: '学习 · 务实 · 新机会。脚踏实地开始。',
+                  reversed: '懒惰 · 拖延 · 缺乏规划。行动起来。' },
+                { id: 411, name: '星币骑士', emoji: '', suit: '星币',
+                  upright: '稳重 · 坚持 · 责任。逐步实现目标。',
+                  reversed: '保守 · 沉闷 · 缺乏灵活。拥抱变化。' },
+                { id: 412, name: '星币王后', emoji: '', suit: '星币',
+                  upright: '滋养 · 丰盛 · 自然。用爱与资源照料他人。',
+                  reversed: '失衡 · 不安全感 · 过度保护。信任他人。' },
+                { id: 413, name: '星币国王', emoji: '🤴', suit: '星币',
+                  upright: '稳定 · 财富 · 责任。成熟的守护者。',
+                  reversed: '贪婪 · 固执 · 物质主义。回归内在价值。' }
+            ];
+            const FULL_DECK = [...MAJOR_ARCANA, ...WANDS, ...CUPS, ...SWORDS, ...PENTACLES];
+
+            // ===== 9种基础牌阵（只保留您提供的） =====
+            const SPREADS = [
+                { id: 'yesno', name: 'Yes or No', desc: '取大阿尔卡纳22张 + 圣杯九 + 4张Ace，共27张。不问正逆位。',
+                  positions: ['答案'], take: 27 },
+                { id: 'gain_lose', name: '得与失', desc: '78张牌。随意抽取2张，同类型可测「一日」「一周」。',
+                  positions: ['我将失去什么', '我将得到什么'], take: 78 },
+                { id: 'timeflow', name: '时间之流', desc: '78张牌。过去 · 现在 · 未来。',
+                  positions: ['过去', '现在', '未来'], take: 78 },
+                { id: 'triangle', name: '圣三角', desc: '22张大阿尔卡纳。从上往下数第7、14、21张。',
+                  positions: ['过去状况', '现在状况', '未来发展'], take: 22 },
+                { id: 'body_mind_spirit', name: '身心灵', desc: '78张牌。身 · 心 · 灵 + 建议牌（切牌）。',
+                  positions: ['身', '心', '灵', '建议'], take: 78 },
+                { id: 'self_explore', name: '自我探索', desc: '78张牌。探索内在状态。',
+                  positions: ['当前状态', '外在表现', '内在渴望', '潜意识'], take: 78 },
+                { id: 'jung', name: '荣格原型', desc: '22张大阿尔卡纳，区分正逆位。',
+                  positions: ['自我/人格面具', '阴暗自我', '阿尼玛/阿尼姆斯', '智慧老人', '自性'], take: 22 },
+                { id: 'choose', name: '二选一', desc: '78张牌。A方案 vs B方案。',
+                  positions: ['本人现状', 'A现状', 'B现状', 'A影响', 'B影响'], take: 78 },
+                { id: 'talent', name: '内在天赋', desc: '78张牌。探索天赋与成长路径。',
+                  positions: ['与生俱来的天赋', '什么环境激发天赋', '如何使用天赋', '如何发扬长处', '如何应对短板', '综合建议'], take: 78 }
+            ];
+
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        spreads: SPREADS,
+                        currentSpreadId: 'yesno',
+                        userQuestion: '',
+                        recommendResult: '',
+                        slots: [],
+                        results: [],
+                        isRoundFinished: false,
+                        isResetting: false,
+                        revealedCount: 0,
+                    };
+                },
+                computed: {
+                    currentSpread() {
+                        return this.spreads.find(s => s.id === this.currentSpreadId) || this.spreads[0];
+                    }
+                },
+                methods: {
+                    shuffleArray(arr) {
+                        for (let i = arr.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [arr[i], arr[j]] = [arr[j], arr[i]];
+                        }
+                        return arr;
+                    },
+                    randomOrientation() { return Math.random() < 0.5; },
+
+                    getDeckForSpread(spreadId) {
+                        const s = this.spreads.find(sp => sp.id === spreadId);
+                        if (!s) return FULL_DECK;
+                        if (s.id === 'yesno') {
+                            const yesNoDeck = [
+                                ...MAJOR_ARCANA,
+                                { id: 208, name: '圣杯九', emoji: '', suit: '圣杯',
+                                  upright: '明确的「是」', reversed: '明确的「是」' },
+                                { id: 100, name: '权杖王牌', emoji: '', suit: '权杖',
+                                  upright: '调整动作/等待时间', reversed: '调整动作/等待时间' },
+                                { id: 200, name: '圣杯王牌', emoji: '', suit: '圣杯',
+                                  upright: '调整动作/等待时间', reversed: '调整动作/等待时间' },
+                                { id: 300, name: '宝剑王牌', emoji: '️', suit: '宝剑',
+                                  upright: '调整动作/等待时间', reversed: '调整动作/等待时间' },
+                                { id: 400, name: '星币王牌', emoji: '🪙', suit: '星币',
+                                  upright: '调整动作/等待时间', reversed: '调整动作/等待时间' }
+                            ];
+                            return yesNoDeck;
+                        }
+                        if (s.id === 'triangle' || s.id === 'jung') {
+                            return MAJOR_ARCANA;
+                        }
+                        return FULL_DECK;
+                    },
+
+                    initRound() {
+                        const deck = this.getDeckForSpread(this.currentSpreadId);
+                        const shuffled = this.shuffleArray([...deck]);
+                        this.slots = shuffled.map(card => ({
+                            card: card,
+                            revealed: false,
+                            isReversed: this.randomOrientation(),
+                        }));
+                        const posCount = this.currentSpread.positions.length;
+                        this.results = Array(posCount).fill(null).map(() => ({
+                            card: { id: -1, name: '?', emoji: '✦' },
+                            revealed: false,
+                            reversed: false,
+                        }));
+                        this.revealedCount = 0;
+                        this.isRoundFinished = false;
+                    },
+
+                    selectSpread(id) {
+                        if (this.isResetting) return;
+                        this.currentSpreadId = id;
+                        this.initRound();
+                        this.recommendResult = '';
+                    },
+
+                    recommendSpread() {
+                        const q = this.userQuestion.trim();
+                        if (!q) {
+                            this.recommendResult = '✧ 请先输入你的问题 ✧';
+                            return;
+                        }
+                        // 关键词映射到牌阵ID（只包含9个牌阵）
+                        const map = {
+                            '是': 'yesno', '否': 'yesno', '吗': 'yesno', '问': 'yesno',
+                            '失去': 'gain_lose', '得到': 'gain_lose', '得失': 'gain_lose',
+                            '过去': 'timeflow', '现在': 'timeflow', '未来': 'timeflow', '发展': 'timeflow',
+                            '身': 'body_mind_spirit', '心': 'body_mind_spirit', '灵': 'body_mind_spirit',
+                            '自我': 'self_explore', '探索': 'self_explore',
+                            '荣格': 'jung', '原型': 'jung', '人格': 'jung',
+                            '选择': 'choose', '二选一': 'choose', '犹豫': 'choose',
+                            '天赋': 'talent', '擅长': 'talent', '成长': 'talent',
+                            '感情': 'timeflow', '爱情': 'timeflow', '关系': 'timeflow',
+                            '事业': 'timeflow', '工作': 'timeflow', '学业': 'timeflow', '财运': 'timeflow',
+                            '建议': 'body_mind_spirit', '指引': 'body_mind_spirit'
+                        };
+                        let best = 'yesno';
+                        let found = false;
+                        for (const [kw, id] of Object.entries(map)) {
+                            if (q.includes(kw)) { best = id; found = true; break; }
+                        }
+                        // 如果没匹配到关键词，根据问题长度或类型猜测
+                        if (!found) {
+                            if (q.length < 10) best = 'yesno';
+                            else if (q.includes('如何') || q.includes('怎样')) best = 'timeflow';
+                            else best = 'timeflow';
+                        }
+                        const spread = this.spreads.find(s => s.id === best);
+                        if (spread) {
+                            this.recommendResult = `✧ 推荐：${spread.name} ✧ ${spread.desc}`;
+                            this.currentSpreadId = best;
+                            this.initRound();
+                        } else {
+                            this.recommendResult = '✧ 未找到合适牌阵，请手动选择 ✧';
+                        }
+                    },
+
+                    revealSlot(index) {
+                        if (this.isRoundFinished) return;
+                        const slot = this.slots[index];
+                        if (slot.revealed) return;
+
+                        slot.revealed = true;
+                        const posIndex = this.revealedCount;
+                        if (posIndex < this.results.length) {
+                            this.results[posIndex] = {
+                                card: { ...slot.card },
+                                revealed: true,
+                                reversed: slot.isReversed,
+                            };
+                        }
+                        this.revealedCount++;
+
+                        if (this.revealedCount >= this.results.length) {
+                            this.isRoundFinished = true;
+                        }
+                    },
+
+                    newRound() {
+                        if (this.isResetting) return;
+                        this.isResetting = true;
+                        setTimeout(() => {
+                            this.initRound();
+                            this.isResetting = false;
+                        }, 400);
+                    },
+
+                    resetAll() {
+                        if (!this.isRoundFinished || this.isResetting) return;
+                        this.slots.forEach(s => s.revealed = false);
+                        this.results.forEach(r => { r.revealed = false; r.card = { id: -1, name: '?', emoji: '✦' }; });
+                        this.revealedCount = 0;
+                        this.isRoundFinished = false;
+                    }
+                },
+                watch: {
+                    currentSpreadId() {
+                        this.initRound();
+                    }
+                },
+                mounted() {
+                    this.initRound();
+                }
+            });
+
+            app.mount('#app');
+        })();
+    </script>
+</body>
+</html>
